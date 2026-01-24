@@ -1,7 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from '@/app/pages/Login';
-import Dashboard from '@/app/pages/Dashboard';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Showcase from './pages/Showcase';
 
 /**
  * Main App component that handles overall routing and layout.
@@ -16,6 +17,9 @@ function App() {
 
         {/* Protected Route: Dashboard (for now just a direct route) */}
         <Route path="/dashboard" element={<Dashboard />} />
+
+        {/* Design System Showcase */}
+        <Route path="/showcase" element={<Showcase />} />
 
         {/* Redirect root to login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
