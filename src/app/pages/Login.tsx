@@ -7,6 +7,8 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 
+import { Logo } from '../components/icons/Logo';
+
 /**
  * Login component providing a premium authenticated entry point.
  * Features a clean, "Google Antigravity" light theme with subtle glassmorphism.
@@ -48,9 +50,9 @@ export default function Login() {
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="mx-auto h-12 w-12 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center mb-4 shadow-[0_8px_16px_rgba(var(--primary),0.2)]"
+              className="mx-auto h-12 w-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center mb-4 shadow-[0_8px_16px_rgba(0,0,0,0.15)]"
             >
-              <CheckSquare className="h-7 w-7" />
+              <Logo className="h-7 w-7" />
             </motion.div>
             <CardTitle className="text-3xl font-bold tracking-tight text-slate-900">Welcome back</CardTitle>
             <CardDescription className="text-slate-500">

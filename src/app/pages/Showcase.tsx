@@ -51,6 +51,8 @@ import { StatsCard } from '../components/task/stats-card';
 import { TeamMember } from '../components/task/team-member';
 import { FilterBar } from '../components/task/filter-bar';
 
+import { Logo } from '../components/icons/Logo';
+
 /**
  * Showcase component displaying the design system components and metrics.
  * @returns {JSX.Element} The rendered Showcase component.
@@ -65,8 +67,8 @@ export default function Showcase() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-primary text-primary-foreground rounded-lg flex items-center justify-center">
-                <CheckSquare className="h-6 w-6" />
+              <div className="h-10 w-10 bg-slate-900 text-white rounded-lg flex items-center justify-center">
+                <Logo className="h-6 w-6" />
               </div>
               <div>
                 <h1 className="font-bold">Task Management</h1>

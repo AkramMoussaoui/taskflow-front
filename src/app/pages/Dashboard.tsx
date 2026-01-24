@@ -24,6 +24,8 @@ import { StatsCard } from '../components/task/stats-card';
 import { KanbanCard } from '../components/task/kanban-card';
 import { KanbanColumn } from '../components/task/kanban-column';
 
+import { Logo } from '../components/icons/Logo';
+
 /**
  * Integrated Dashboard component.
  * Combines high-level stats with an interactive Kanban board.
@@ -35,8 +37,8 @@ export default function Dashboard() {
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col">
         <div className="p-6 flex items-center gap-3">
-          <div className="h-10 w-10 bg-primary text-primary-foreground rounded-xl flex items-center justify-center shadow-[0_4px_12px_rgba(var(--primary),0.2)]">
-            <CheckSquare className="h-6 w-6" />
+          <div className="h-10 w-10 bg-slate-900 text-white rounded-xl flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+            <Logo className="h-6 w-6" />
           </div>
           <span className="font-bold text-xl tracking-tight text-slate-900">TaskFlow</span>
         </div>
