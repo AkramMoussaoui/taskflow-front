@@ -10,39 +10,36 @@ Ce document décrit les interactions entre les différents composants de l'appli
 ```mermaid
 graph TD
     User[Utilisateur] --> LP[Landing Page Premium]
-    LP -->|Navigation| Features[Section Fonctionnalités]
-    LP -->|Navigation| Pricing[Section Tarification]
-    LP -->|Clic: Sign In / Get Started| B{Authentification}
     
-    B -->|Non connecté| C[Page de Connexion]
-    B -->|Connecté| D[Tableau de Bord]
+    subgraph Frontend [Application React Client]
+        LP -->|Clic: Sign In| Login[Page de Connexion]
+        LP -->|Clic: Get Started| Signup[Page d'Inscription]
+        
+        Login <-->|Lien| Signup
+        
+        Login -->|Auth Réussie| Dashboard[Tableau de Bord]
+        Signup -->|Compte Créé| Dashboard
+        
+        Dashboard --> Sidebar[Barre Latérale]
+        Dashboard --> Kanban[Tableau Kanban]
+        Dashboard --> Stats[Statistiques]
+        Dashboard -->|Action| TaskModal[Modale de Tâche]
+    end
+
+    subgraph Backend [AWS Serverless Cloud]
+        API[Lambda Function URL]
+        Auth[AWS Cognito]
+        DB[(DynamoDB)]
+    end
+
+    Login -.->|Authentification| Auth
+    Signup -.->|Création Compte| Auth
     
-    C <-->|Lien| Signup[Page d'Inscription]
-    Signup -->|Création de compte| D
+    Dashboard <-->|Fetch Tasks| API
+    TaskModal -->|Create/Update/Delete| API
     
-    C -->|Identifiants valides| D
-    
-    D --> E[Barre Latérale - Sidebar]
-    D --> F[Section Statistiques]
-    D --> G[Tableau Kanban]
-    D -->|Action| CT[Popup de Création de Tâche]
-    CT -->|Validation| G
-    
-    E -->|Navigation| D
-    E -->|Navigation| H[Showcase des Composants]
-    E -->|Action| I[Déconnexion]
-    
-    F -->|Données| J[Total Tâches / En Cours / Terminé]
-    
-    G --> K[Colonnes de Statut]
-    K --> L[Cartes de Tâches]
-    L -->|Glisser-déposer| K
-    L -->|Clic| DV[Vue Détaillée de Tâche]
-    DV -->|Edition/Suppression| G
-    
-    H --> M[Aperçu des Composants UI]
-    
-    I --> C
+    API <-->|CRUD Operations| DB
+    API -.->|Token Verification| Auth
 ```
 
 ## Interactions des Services

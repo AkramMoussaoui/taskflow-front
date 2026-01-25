@@ -32,6 +32,9 @@ import { TaskDetailDialog } from '../components/task/task-detail-dialog';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
+// API Service
+import { taskApi, TaskResponse } from '../services/api';
+
 /**
  * Comment interface.
  */
@@ -58,140 +61,122 @@ export interface Task {
   attachments?: number;
 }
 
-const INITIAL_TASKS: Task[] = [
-  {
-    id: '1',
-    title: "Design new landing page",
-    description: "Create a modern, responsive landing page design using Figma. Focus on glassmorphism and fluid typography.",
-    priority: "high",
-    status: 'todo',
-    assignees: [
-      { name: "Sarah Chen", initials: "SC" },
-      { name: "Mike Johnson", initials: "MJ" },
-    ],
-    dueDate: "2026-01-28",
-    tags: ["Design", "Frontend"],
-    comments: [
-      { id: 'c1', user: 'Sarah Chen', text: 'Initial sketches are ready.', date: '2 hours ago' }
-    ],
-  },
-  {
-    id: '2',
-    title: "Implement search functionality",
-    description: "Core search feature for filtering tasks and team members.",
-    priority: "medium",
-    status: 'todo',
-    assignees: [{ name: "Alex Rivera", initials: "AR" }],
-    dueDate: "2026-01-30",
-    tags: ["Feature"],
-    comments: [],
-    attachments: 1,
-  },
-  {
-    id: '3',
-    title: "API integration for payments",
-    description: "Connect the backend payment service with the frontend application using Stripe.",
-    priority: "critical",
-    status: 'in-progress',
-    assignees: [
-      { name: "David Kim", initials: "DK" },
-      { name: "Emily Davis", initials: "ED" },
-    ],
-    dueDate: "2026-01-26",
-    tags: ["Backend", "Payment"],
-    comments: [],
-    attachments: 2,
-  },
-  {
-    id: '4',
-    title: "Refactor authentication module",
-    description: "Improve security protocols and session management.",
-    priority: "high",
-    status: 'in-progress',
-    assignees: [{ name: "Sarah Chen", initials: "SC" }],
-    dueDate: "2026-01-29",
-    tags: ["Backend", "Security"],
-    comments: [],
-  },
-  {
-    id: '5',
-    title: "Update user documentation",
-    description: "Add new sections for onboarding and setup.",
-    priority: "low",
-    status: 'review',
-    assignees: [{ name: "Lisa Wang", initials: "LW" }],
-    dueDate: "2026-02-01",
-    tags: ["Documentation"],
-    comments: [],
-  },
-  {
-    id: '6',
-    title: "Setup CI/CD pipeline",
-    description: "Automate build and deployment process.",
-    priority: "high",
-    status: 'done',
-    assignees: [
-      { name: "David Kim", initials: "DK" },
-      { name: "Alex Rivera", initials: "AR" },
-    ],
-    tags: ["DevOps"],
-    comments: [],
-  },
-  {
-    id: '7',
-    title: "Mobile responsive fixes",
-    description: "Fix layout issues on mobile devices.",
-    priority: "medium",
-    status: 'done',
-    assignees: [{ name: "Mike Johnson", initials: "MJ" }],
-    tags: ["Frontend", "Mobile"],
-    comments: [],
-  },
-];
-
 /**
  * Integrated Dashboard component.
  * Combines high-level stats with an interactive Kanban board.
  * @returns {JSX.Element} The rendered Dashboard component.
  */
 export default function Dashboard() {
-  const [tasks, setTasks] = React.useState<Task[]>(INITIAL_TASKS);
+  const [tasks, setTasks] = React.useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = React.useState<Task | null>(null);
   const [detailOpen, setDetailOpen] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  // Load tasks on mount
+  React.useEffect(() => {
+    const loadTasks = async () => {
+      try {
+        setIsLoading(true);
+        const data = await taskApi.listTasks();
+        // Map backend taskId to frontend id
+        const mappedTasks: Task[] = data.map(t => ({
+          id: t.taskId,
+          title: t.title,
+          description: t.description,
+          priority: t.priority,
+          status: t.status,
+          assignees: t.assignees || [{ name: "Sarah Chen", initials: "SC" }],
+          tags: t.tags || [],
+          comments: t.comments || [],
+          dueDate: t.dueDate,
+          attachments: (t as any).attachments || 0
+        }));
+        setTasks(mappedTasks);
+      } catch (error) {
+        console.error('Failed to load tasks:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadTasks();
+  }, []);
 
   const handleCardClick = (task: Task) => {
     setSelectedTask(task);
     setDetailOpen(true);
   };
 
-  const addTask = (data: { title: string; description: string; priority: Task['priority']; tags: string[] }) => {
-    const newTask: Task = {
-      id: Math.random().toString(36).substring(2, 9),
-      title: data.title,
-      priority: data.priority,
-      status: 'todo',
-      assignees: [{ name: "Sarah Chen", initials: "SC" }], // Default assignee for demo
-      tags: data.tags,
-      comments: [],
-      attachments: 0,
-    };
-    setTasks(prev => [newTask, ...prev]);
+  const addTask = async (data: { title: string; description: string; priority: Task['priority']; tags: string[] }) => {
+    try {
+      const newTaskResponse = await taskApi.createTask({
+        title: data.title,
+        description: data.description,
+        priority: data.priority,
+        status: 'todo',
+        tags: data.tags,
+        assignees: [{ name: "Sarah Chen", initials: "SC" }],
+      });
+      
+      const mappedTask: Task = {
+        id: newTaskResponse.taskId,
+        title: newTaskResponse.title,
+        description: newTaskResponse.description,
+        priority: newTaskResponse.priority,
+        status: newTaskResponse.status,
+        assignees: newTaskResponse.assignees || [],
+        tags: newTaskResponse.tags || [],
+        comments: newTaskResponse.comments || [],
+        dueDate: newTaskResponse.dueDate
+      };
+      
+      setTasks(prev => [mappedTask, ...prev]);
+    } catch (error) {
+      console.error('Failed to create task:', error);
+    }
   };
 
-  const moveTask = (taskId: string, targetStatus: Task['status']) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, status: targetStatus } : task
-      )
-    );
+  const moveTask = async (taskId: string, targetStatus: Task['status']) => {
+    // Optimistic update
+    const previousTasks = [...tasks];
+    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: targetStatus } : t));
+    
+    try {
+      await taskApi.updateTask(taskId, { status: targetStatus });
+    } catch (error) {
+      console.error('Failed to move task:', error);
+      setTasks(previousTasks); // Rollback
+    }
   };
 
-  const updateTask = (updatedTask: Task) => {
+  const updateTask = async (updatedTask: Task) => {
+    const previousTasks = [...tasks];
     setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t));
+    
+    try {
+      await taskApi.updateTask(updatedTask.id, {
+        title: updatedTask.title,
+        description: updatedTask.description,
+        priority: updatedTask.priority,
+        status: updatedTask.status,
+        tags: updatedTask.tags,
+        dueDate: updatedTask.dueDate
+      });
+    } catch (error) {
+      console.error('Failed to update task:', error);
+      setTasks(previousTasks);
+    }
   };
 
-  const deleteTask = (taskId: string) => {
+  const deleteTask = async (taskId: string) => {
+    const previousTasks = [...tasks];
     setTasks(prev => prev.filter(t => t.id !== taskId));
+    
+    try {
+      await taskApi.deleteTask(taskId);
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+      setTasks(previousTasks);
+    }
   };
 
   return (
@@ -210,10 +195,6 @@ export default function Dashboard() {
           <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2 bg-slate-100 text-primary rounded-lg font-medium">
             <LayoutDashboard className="h-5 w-5" />
             Dashboard
-          </Link>
-          <Link to="/showcase" className="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
-            <CheckSquare className="h-5 w-5" />
-            Components
           </Link>
         </nav>
 
@@ -306,74 +287,83 @@ export default function Dashboard() {
           {/* Kanban Board Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-slate-900">Kanban Board</h3>
+              <h3 className="text-lg font-semibold text-slate-900">Board</h3>
               <Button variant="link" className="text-primary p-0 h-auto font-medium">View all tasks</Button>
             </div>
             
             <div className="flex gap-6 overflow-x-auto pb-6 -mx-2 px-2">
-              <KanbanColumn 
-                title="To Do" 
-                status="todo"
-                count={tasks.filter(t => t.status === 'todo').length} 
-                color="var(--status-todo)"
-                onDropTask={(id) => moveTask(id, 'todo')}
-              >
-                {tasks.filter(t => t.status === 'todo').map(task => (
-                  <KanbanCard 
-                    key={task.id} 
-                    {...task} 
-                    onClick={() => handleCardClick(task)}
-                  />
-                ))}
-              </KanbanColumn>
+              {isLoading ? (
+                <div className="flex-1 flex flex-col items-center justify-center py-20 bg-white/50 rounded-2xl border border-dashed border-slate-200">
+                  <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mb-4" />
+                  <p className="text-slate-500 font-medium">Syncing with workspace...</p>
+                </div>
+              ) : (
+                <>
+                  <KanbanColumn 
+                    title="To Do" 
+                    status="todo"
+                    count={tasks.filter(t => t.status === 'todo').length} 
+                    color="var(--status-todo)"
+                    onDropTask={(id) => moveTask(id, 'todo')}
+                  >
+                    {tasks.filter(t => t.status === 'todo').map(task => (
+                      <KanbanCard 
+                        key={task.id} 
+                        {...task} 
+                        onClick={() => handleCardClick(task)}
+                      />
+                    ))}
+                  </KanbanColumn>
 
-              <KanbanColumn 
-                title="In Progress" 
-                status="in-progress"
-                count={tasks.filter(t => t.status === 'in-progress').length} 
-                color="var(--status-in-progress)"
-                onDropTask={(id) => moveTask(id, 'in-progress')}
-              >
-                {tasks.filter(t => t.status === 'in-progress').map(task => (
-                  <KanbanCard 
-                    key={task.id} 
-                    {...task} 
-                    onClick={() => handleCardClick(task)}
-                  />
-                ))}
-              </KanbanColumn>
+                  <KanbanColumn 
+                    title="In Progress" 
+                    status="in-progress"
+                    count={tasks.filter(t => t.status === 'in-progress').length} 
+                    color="var(--status-in-progress)"
+                    onDropTask={(id) => moveTask(id, 'in-progress')}
+                  >
+                    {tasks.filter(t => t.status === 'in-progress').map(task => (
+                      <KanbanCard 
+                        key={task.id} 
+                        {...task} 
+                        onClick={() => handleCardClick(task)}
+                      />
+                    ))}
+                  </KanbanColumn>
 
-              <KanbanColumn 
-                title="Review" 
-                status="review"
-                count={tasks.filter(t => t.status === 'review').length} 
-                color="var(--status-review)"
-                onDropTask={(id) => moveTask(id, 'review')}
-              >
-                {tasks.filter(t => t.status === 'review').map(task => (
-                  <KanbanCard 
-                    key={task.id} 
-                    {...task} 
-                    onClick={() => handleCardClick(task)}
-                  />
-                ))}
-              </KanbanColumn>
+                  <KanbanColumn 
+                    title="Review" 
+                    status="review"
+                    count={tasks.filter(t => t.status === 'review').length} 
+                    color="var(--status-review)"
+                    onDropTask={(id) => moveTask(id, 'review')}
+                  >
+                    {tasks.filter(t => t.status === 'review').map(task => (
+                      <KanbanCard 
+                        key={task.id} 
+                        {...task} 
+                        onClick={() => handleCardClick(task)}
+                      />
+                    ))}
+                  </KanbanColumn>
 
-              <KanbanColumn 
-                title="Done" 
-                status="done"
-                count={tasks.filter(t => t.status === 'done').length} 
-                color="var(--status-done)"
-                onDropTask={(id) => moveTask(id, 'done')}
-              >
-                {tasks.filter(t => t.status === 'done').map(task => (
-                  <KanbanCard 
-                    key={task.id} 
-                    {...task} 
-                    onClick={() => handleCardClick(task)}
-                  />
-                ))}
-              </KanbanColumn>
+                  <KanbanColumn 
+                    title="Done" 
+                    status="done"
+                    count={tasks.filter(t => t.status === 'done').length} 
+                    color="var(--status-done)"
+                    onDropTask={(id) => moveTask(id, 'done')}
+                  >
+                    {tasks.filter(t => t.status === 'done').map(task => (
+                      <KanbanCard 
+                        key={task.id} 
+                        {...task} 
+                        onClick={() => handleCardClick(task)}
+                      />
+                    ))}
+                  </KanbanColumn>
+                </>
+              )}
             </div>
           </div>
         </div>

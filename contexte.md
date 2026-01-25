@@ -28,13 +28,18 @@ TaskFlow est une application web moderne et premium de gestion de tâches. Elle 
 
 ## Architecture Technique
 - **Frontend** : React 19 (TypeScript)
-- **Routage** : React Router Dom 7 (Navigation fluide entre Landing, Login et Dashboard).
-- **Smooth Scrolling** : Expérience de navigation optimisée sur la landing page via CSS global.
-- **Stylisation** : Tailwind CSS 4 & Radix UI pour des composants accessibles et hautement personnalisables.
-- **Icons** : Lucide React & Logo SVG personnalisé.
-- **Animations** : Framer Motion pour les transitions et micro-interactions premium.
-- **Drag & Drop** : `react-dnd` avec `html5-backend` pour une gestion robuste des interactions.
-- **Build Tool** : Vite pour un développement rapide et des builds optimisés.
+    - **Build Tool** : Vite (Rapide et optimisé)
+    - **Routage** : React Router Dom 7
+    - **Stylisation** : Tailwind CSS 4 & Radix UI
+    - **Icons** : Lucide React
+    - **Animations** : Framer Motion
+    - **Drag & Drop** : `react-dnd`
+- **Backend** : AWS Serverless
+    - **Core** : AWS Lambda (Node.js) avec Function URL pour l'API.
+    - **Infrastructure** : AWS CDK (TypeScript) pour le déploiement.
+    - **Base de Données** : DynamoDB (Stockage NoSQL performant).
+    - **Authentification** : AWS Cognito (Gestion des utilisateurs sécurisée).
+    - **Communication** : API REST via Lambda Function URL.
 
 ## Structure du Projet (src)
 - `app/` : Racine de l'application.
