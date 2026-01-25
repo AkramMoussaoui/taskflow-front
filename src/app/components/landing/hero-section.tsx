@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { VideoModal } from './video-modal';
+
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { ArrowRight, CheckCircle2, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function HeroSection() {
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+
   return (
     <section className="relative overflow-hidden py-20 md:py-28">
-      {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-background" />
+
+      <VideoModal isOpen={isVideoOpen} onOpenChange={setIsVideoOpen} />
       
       <div className="container relative mx-auto px-6">
         <div className="mx-auto max-w-4xl text-center">
@@ -44,10 +49,10 @@ export function HeroSection() {
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="group">
-              <Play className="mr-2 h-4 w-4" />
-              Watch demo
-            </Button>
+              <Button size="lg" variant="outline" className="group" onClick={() => setIsVideoOpen(true)}>
+                <Play className="mr-2 h-4 w-4" />
+                Watch demo
+              </Button>
           </div>
 
           {/* Trust indicators */}
