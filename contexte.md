@@ -10,7 +10,9 @@ TaskFlow est une application web moderne et premium de gestion de tâches. Elle 
     - **Validation Dynamique du Mot de Passe** : Analyse en temps réel de la complexité (longueur, majuscule, chiffre, caractère spécial).
 - **Tableau de Bord Intégré** : Une vue d'ensemble centralisée combinant des indicateurs de performance clés (KPI) et un tableau Kanban.
 - **Indicateurs de Performance (Stats)** : Suivi en temps réel des tâches totales, en cours, terminées et des membres de l'équipe.
-- **Tableau Kanban** : Organisation visuelle des tâches par colonnes (À faire, En cours, Révision, Terminé) avec cards détaillées (priorité, tags, assignés, dates).
+- **Tableau Kanban Interactif** : Organisation visuelle des tâches par colonnes (À faire, En cours, Révision, Terminé).
+    - **Glisser-Déposer (Drag & Drop)** : Déplacement fluide des tâches entre les colonnes pour une mise à jour instantanée du statut.
+    - **Cards Détaillées** : Priorité, tags, assignés et dates d'échéance.
 - **Showcase du Design System** : Une bibliothèque exhaustive de composants UI réutilisables basés sur les meilleures pratiques de design (Radix UI, Tailwind CSS).
 - **Navigation Intuitive** : Une barre latérale persistante permettant de naviguer entre le dashboard principal et le showcase des composants.
 
@@ -20,6 +22,7 @@ TaskFlow est une application web moderne et premium de gestion de tâches. Elle 
 - **Stylisation** : Tailwind CSS 4 & Radix UI pour des composants accessibles et hautement personnalisables.
 - **Icons** : Lucide React & Logo SVG personnalisé.
 - **Animations** : Framer Motion pour les transitions et micro-interactions premium.
+- **Drag & Drop** : `react-dnd` avec `html5-backend` pour une gestion robuste des interactions.
 - **Build Tool** : Vite pour un développement rapide et des builds optimisés.
 
 ## Structure du Projet (src)

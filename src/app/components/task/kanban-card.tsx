@@ -1,12 +1,14 @@
 import React from 'react';
-import { Card, CardContent, CardHeader } from '@/app/components/ui/card';
-import { PriorityBadge } from '@/app/components/task/priority-badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar';
-import { Badge } from '@/app/components/ui/badge';
+import { useDrag } from 'react-dnd';
+import { Card, CardContent, CardHeader } from '../ui/card';
+import { PriorityBadge } from './priority-badge';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Badge } from '../ui/badge';
 import { Calendar, MessageSquare, Paperclip } from 'lucide-react';
-import { cn } from '@/app/components/ui/utils';
+import { cn } from '../ui/utils';
 
 export interface KanbanCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  id: string;
   title: string;
   priority?: 'low' | 'medium' | 'high' | 'critical';
   assignees?: Array<{
@@ -22,6 +24,7 @@ export interface KanbanCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function KanbanCard({
   className,
+  id,
   title,
   priority,
   assignees = [],
@@ -31,10 +34,20 @@ export function KanbanCard({
   attachments,
   ...props
 }: KanbanCardProps) {
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: 'TASK',
+    item: { id },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  }));
+
   return (
     <Card
+      ref={drag as any}
       className={cn(
         'cursor-move hover:shadow-lg transition-all hover:scale-[1.02] active:scale-100 active:cursor-grabbing',
+        isDragging && 'opacity-50 grayscale scale-95',
         className
       )}
       {...props}

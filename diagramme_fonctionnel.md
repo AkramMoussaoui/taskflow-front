@@ -30,6 +30,7 @@ graph TD
     
     G --> K[Colonnes de Statut]
     K --> L[Cartes de Tâches]
+    L -->|Glisser-déposer| K
     
     H --> M[Aperçu des Composants UI]
     
@@ -39,5 +40,6 @@ graph TD
 ## Interactions des Services
 
 - **Navigation** : Gérée par `React Router`, permettant des transitions instantanées entre les vues sans recharger la page.
-- **État UI** : Utilisation de `useState` et des props React pour la communication entre les composants parents (Pages) et enfants (Task Cards, Stats Cards).
-- **Design System** : Utilisation de `Tailwind CSS` pour un rendu visuel cohérent sur tout le site.
+- **Gestion du Drag & Drop** : Utilisation de `react-dnd` pour synchroniser l'UI avec l'état des tâches lors des déplacements.
+- **État Global (Simulé)** : Utilisation de `useState` dans le Dashboard pour centraliser la liste des tâches et assurer la cohérence visuelle après chaque action utilisateur.
+- **Design System** : Utilisation de `Tailwind CSS 4` pour un rendu visuel premium et cohérent sur tout le site.

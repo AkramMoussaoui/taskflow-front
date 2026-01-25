@@ -26,13 +26,123 @@ import { KanbanColumn } from '../components/task/kanban-column';
 
 import { Logo } from '../components/icons/Logo';
 
+// DnD Imports
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
+/**
+ * Task interface for the Kanban board.
+ */
+interface Task {
+  id: string;
+  title: string;
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  status: 'todo' | 'in-progress' | 'review' | 'done';
+  assignees: Array<{ name: string; initials: string; avatar?: string }>;
+  dueDate?: string;
+  tags?: string[];
+  comments?: number;
+  attachments?: number;
+}
+
+const INITIAL_TASKS: Task[] = [
+  {
+    id: '1',
+    title: "Design new landing page",
+    priority: "high",
+    status: 'todo',
+    assignees: [
+      { name: "Sarah Chen", initials: "SC" },
+      { name: "Mike Johnson", initials: "MJ" },
+    ],
+    dueDate: "Jan 28",
+    tags: ["Design", "Frontend"],
+    comments: 3,
+  },
+  {
+    id: '2',
+    title: "Implement search functionality",
+    priority: "medium",
+    status: 'todo',
+    assignees: [{ name: "Alex Rivera", initials: "AR" }],
+    dueDate: "Jan 30",
+    tags: ["Feature"],
+    attachments: 1,
+  },
+  {
+    id: '3',
+    title: "API integration for payments",
+    priority: "critical",
+    status: 'in-progress',
+    assignees: [
+      { name: "David Kim", initials: "DK" },
+      { name: "Emily Davis", initials: "ED" },
+    ],
+    dueDate: "Jan 26",
+    tags: ["Backend", "Payment"],
+    comments: 8,
+    attachments: 2,
+  },
+  {
+    id: '4',
+    title: "Refactor authentication module",
+    priority: "high",
+    status: 'in-progress',
+    assignees: [{ name: "Sarah Chen", initials: "SC" }],
+    dueDate: "Jan 29",
+    tags: ["Backend", "Security"],
+    comments: 5,
+  },
+  {
+    id: '5',
+    title: "Update user documentation",
+    priority: "low",
+    status: 'review',
+    assignees: [{ name: "Lisa Wang", initials: "LW" }],
+    dueDate: "Feb 1",
+    tags: ["Documentation"],
+    comments: 2,
+  },
+  {
+    id: '6',
+    title: "Setup CI/CD pipeline",
+    priority: "high",
+    status: 'done',
+    assignees: [
+      { name: "David Kim", initials: "DK" },
+      { name: "Alex Rivera", initials: "AR" },
+    ],
+    tags: ["DevOps"],
+    comments: 6,
+  },
+  {
+    id: '7',
+    title: "Mobile responsive fixes",
+    priority: "medium",
+    status: 'done',
+    assignees: [{ name: "Mike Johnson", initials: "MJ" }],
+    tags: ["Frontend", "Mobile"],
+  },
+];
+
 /**
  * Integrated Dashboard component.
  * Combines high-level stats with an interactive Kanban board.
  * @returns {JSX.Element} The rendered Dashboard component.
  */
 export default function Dashboard() {
+  const [tasks, setTasks] = React.useState<Task[]>(INITIAL_TASKS);
+
+  const moveTask = (taskId: string, targetStatus: Task['status']) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === taskId ? { ...task, status: targetStatus } : task
+      )
+    );
+  };
+
   return (
+    <DndProvider backend={HTML5Backend}>
     <div className="flex h-screen bg-slate-50 overflow-hidden">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col">
@@ -146,84 +256,58 @@ export default function Dashboard() {
             </div>
             
             <div className="flex gap-6 overflow-x-auto pb-6 -mx-2 px-2">
-              <KanbanColumn title="To Do" count={5} color="var(--status-todo)">
-                <KanbanCard
-                  title="Design new landing page"
-                  priority="high"
-                  assignees={[
-                    { name: "Sarah Chen", initials: "SC" },
-                    { name: "Mike Johnson", initials: "MJ" },
-                  ]}
-                  dueDate="Jan 28"
-                  tags={["Design", "Frontend"]}
-                  comments={3}
-                />
-                <KanbanCard
-                  title="Implement search functionality"
-                  priority="medium"
-                  assignees={[{ name: "Alex Rivera", initials: "AR" }]}
-                  dueDate="Jan 30"
-                  tags={["Feature"]}
-                  attachments={1}
-                />
+              <KanbanColumn 
+                title="To Do" 
+                status="todo"
+                count={tasks.filter(t => t.status === 'todo').length} 
+                color="var(--status-todo)"
+                onDropTask={(id) => moveTask(id, 'todo')}
+              >
+                {tasks.filter(t => t.status === 'todo').map(task => (
+                  <KanbanCard key={task.id} {...task} />
+                ))}
               </KanbanColumn>
 
-              <KanbanColumn title="In Progress" count={3} color="var(--status-in-progress)">
-                <KanbanCard
-                  title="API integration for payments"
-                  priority="critical"
-                  assignees={[
-                    { name: "David Kim", initials: "DK" },
-                    { name: "Emily Davis", initials: "ED" },
-                  ]}
-                  dueDate="Jan 26"
-                  tags={["Backend", "Payment"]}
-                  comments={8}
-                  attachments={2}
-                />
-                <KanbanCard
-                  title="Refactor authentication module"
-                  priority="high"
-                  assignees={[{ name: "Sarah Chen", initials: "SC" }]}
-                  dueDate="Jan 29"
-                  tags={["Backend", "Security"]}
-                  comments={5}
-                />
+              <KanbanColumn 
+                title="In Progress" 
+                status="in-progress"
+                count={tasks.filter(t => t.status === 'in-progress').length} 
+                color="var(--status-in-progress)"
+                onDropTask={(id) => moveTask(id, 'in-progress')}
+              >
+                {tasks.filter(t => t.status === 'in-progress').map(task => (
+                  <KanbanCard key={task.id} {...task} />
+                ))}
               </KanbanColumn>
 
-              <KanbanColumn title="Review" count={2} color="var(--status-review)">
-                <KanbanCard
-                  title="Update user documentation"
-                  priority="low"
-                  assignees={[{ name: "Lisa Wang", initials: "LW" }]}
-                  dueDate="Feb 1"
-                  tags={["Documentation"]}
-                  comments={2}
-                />
+              <KanbanColumn 
+                title="Review" 
+                status="review"
+                count={tasks.filter(t => t.status === 'review').length} 
+                color="var(--status-review)"
+                onDropTask={(id) => moveTask(id, 'review')}
+              >
+                {tasks.filter(t => t.status === 'review').map(task => (
+                  <KanbanCard key={task.id} {...task} />
+                ))}
               </KanbanColumn>
 
-              <KanbanColumn title="Done" count={12} color="var(--status-done)">
-                <KanbanCard
-                  title="Setup CI/CD pipeline"
-                  priority="high"
-                  assignees={[
-                    { name: "David Kim", initials: "DK" },
-                    { name: "Alex Rivera", initials: "AR" },
-                  ]}
-                  tags={["DevOps"]}
-                  comments={6}
-                />
-                <KanbanCard
-                  title="Mobile responsive fixes"
-                  priority="medium"
-                  assignees={[{ name: "Mike Johnson", initials: "MJ" }]}
-                  tags={["Frontend", "Mobile"]}
-                />
+              <KanbanColumn 
+                title="Done" 
+                status="done"
+                count={tasks.filter(t => t.status === 'done').length} 
+                color="var(--status-done)"
+                onDropTask={(id) => moveTask(id, 'done')}
+              >
+                {tasks.filter(t => t.status === 'done').map(task => (
+                  <KanbanCard key={task.id} {...task} />
+                ))}
               </KanbanColumn>
             </div>
           </div>
         </div>
       </main>
     </div>
+    </DndProvider>
   );
 }
