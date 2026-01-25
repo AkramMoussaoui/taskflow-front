@@ -18,8 +18,9 @@ export interface KanbanCardProps extends React.HTMLAttributes<HTMLDivElement> {
   }>;
   dueDate?: string;
   tags?: string[];
-  comments?: number;
+  comments?: any[];
   attachments?: number;
+  onClick?: () => void;
 }
 
 export function KanbanCard({
@@ -30,8 +31,9 @@ export function KanbanCard({
   assignees = [],
   dueDate,
   tags = [],
-  comments,
+  comments = [],
   attachments,
+  onClick,
   ...props
 }: KanbanCardProps) {
   const [{ isDragging }, drag] = useDrag(() => ({
@@ -45,8 +47,9 @@ export function KanbanCard({
   return (
     <Card
       ref={drag as any}
+      onClick={onClick}
       className={cn(
-        'cursor-move hover:shadow-lg transition-all hover:scale-[1.02] active:scale-100 active:cursor-grabbing',
+        'cursor-pointer cursor-move hover:shadow-lg transition-all hover:scale-[1.02] active:scale-100 active:cursor-grabbing',
         isDragging && 'opacity-50 grayscale scale-95',
         className
       )}
@@ -81,10 +84,10 @@ export function KanbanCard({
                 <span>{dueDate}</span>
               </div>
             )}
-            {comments !== undefined && comments > 0 && (
+            {comments && comments.length > 0 && (
               <div className="flex items-center gap-1">
                 <MessageSquare className="h-3.5 w-3.5" />
-                <span>{comments}</span>
+                <span>{comments.length}</span>
               </div>
             )}
             {attachments !== undefined && attachments > 0 && (

@@ -26,23 +26,35 @@ import { KanbanColumn } from '../components/task/kanban-column';
 
 import { Logo } from '../components/icons/Logo';
 import { CreateTaskDialog } from '../components/task/create-task-dialog';
+import { TaskDetailDialog } from '../components/task/task-detail-dialog';
 
 // DnD Imports
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 /**
+ * Comment interface.
+ */
+interface Comment {
+  id: string;
+  user: string;
+  text: string;
+  date: string;
+}
+
+/**
  * Task interface for the Kanban board.
  */
-interface Task {
+export interface Task {
   id: string;
   title: string;
+  description?: string;
   priority: 'low' | 'medium' | 'high' | 'critical';
   status: 'todo' | 'in-progress' | 'review' | 'done';
   assignees: Array<{ name: string; initials: string; avatar?: string }>;
   dueDate?: string;
   tags?: string[];
-  comments?: number;
+  comments: Comment[];
   attachments?: number;
 }
 
@@ -50,63 +62,72 @@ const INITIAL_TASKS: Task[] = [
   {
     id: '1',
     title: "Design new landing page",
+    description: "Create a modern, responsive landing page design using Figma. Focus on glassmorphism and fluid typography.",
     priority: "high",
     status: 'todo',
     assignees: [
       { name: "Sarah Chen", initials: "SC" },
       { name: "Mike Johnson", initials: "MJ" },
     ],
-    dueDate: "Jan 28",
+    dueDate: "2026-01-28",
     tags: ["Design", "Frontend"],
-    comments: 3,
+    comments: [
+      { id: 'c1', user: 'Sarah Chen', text: 'Initial sketches are ready.', date: '2 hours ago' }
+    ],
   },
   {
     id: '2',
     title: "Implement search functionality",
+    description: "Core search feature for filtering tasks and team members.",
     priority: "medium",
     status: 'todo',
     assignees: [{ name: "Alex Rivera", initials: "AR" }],
-    dueDate: "Jan 30",
+    dueDate: "2026-01-30",
     tags: ["Feature"],
+    comments: [],
     attachments: 1,
   },
   {
     id: '3',
     title: "API integration for payments",
+    description: "Connect the backend payment service with the frontend application using Stripe.",
     priority: "critical",
     status: 'in-progress',
     assignees: [
       { name: "David Kim", initials: "DK" },
       { name: "Emily Davis", initials: "ED" },
     ],
-    dueDate: "Jan 26",
+    dueDate: "2026-01-26",
     tags: ["Backend", "Payment"],
-    comments: 8,
+    comments: [],
     attachments: 2,
   },
   {
     id: '4',
     title: "Refactor authentication module",
+    description: "Improve security protocols and session management.",
     priority: "high",
     status: 'in-progress',
     assignees: [{ name: "Sarah Chen", initials: "SC" }],
-    dueDate: "Jan 29",
+    dueDate: "2026-01-29",
     tags: ["Backend", "Security"],
-    comments: 5,
+    comments: [],
   },
   {
     id: '5',
     title: "Update user documentation",
+    description: "Add new sections for onboarding and setup.",
     priority: "low",
     status: 'review',
     assignees: [{ name: "Lisa Wang", initials: "LW" }],
-    dueDate: "Feb 1",
+    dueDate: "2026-02-01",
     tags: ["Documentation"],
-    comments: 2,
+    comments: [],
   },
   {
     id: '6',
     title: "Setup CI/CD pipeline",
+    description: "Automate build and deployment process.",
     priority: "high",
     status: 'done',
     assignees: [
@@ -114,15 +135,17 @@ const INITIAL_TASKS: Task[] = [
       { name: "Alex Rivera", initials: "AR" },
     ],
     tags: ["DevOps"],
-    comments: 6,
+    comments: [],
   },
   {
     id: '7',
     title: "Mobile responsive fixes",
+    description: "Fix layout issues on mobile devices.",
     priority: "medium",
     status: 'done',
     assignees: [{ name: "Mike Johnson", initials: "MJ" }],
     tags: ["Frontend", "Mobile"],
+    comments: [],
   },
 ];
 
@@ -133,6 +156,13 @@ const INITIAL_TASKS: Task[] = [
  */
 export default function Dashboard() {
   const [tasks, setTasks] = React.useState<Task[]>(INITIAL_TASKS);
+  const [selectedTask, setSelectedTask] = React.useState<Task | null>(null);
+  const [detailOpen, setDetailOpen] = React.useState(false);
+
+  const handleCardClick = (task: Task) => {
+    setSelectedTask(task);
+    setDetailOpen(true);
+  };
 
   const addTask = (data: { title: string; description: string; priority: Task['priority']; tags: string[] }) => {
     const newTask: Task = {
@@ -142,7 +172,7 @@ export default function Dashboard() {
       status: 'todo',
       assignees: [{ name: "Sarah Chen", initials: "SC" }], // Default assignee for demo
       tags: data.tags,
-      comments: 0,
+      comments: [],
       attachments: 0,
     };
     setTasks(prev => [newTask, ...prev]);
@@ -154,6 +184,14 @@ export default function Dashboard() {
         task.id === taskId ? { ...task, status: targetStatus } : task
       )
     );
+  };
+
+  const updateTask = (updatedTask: Task) => {
+    setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t));
+  };
+
+  const deleteTask = (taskId: string) => {
+    setTasks(prev => prev.filter(t => t.id !== taskId));
   };
 
   return (
@@ -281,7 +319,11 @@ export default function Dashboard() {
                 onDropTask={(id) => moveTask(id, 'todo')}
               >
                 {tasks.filter(t => t.status === 'todo').map(task => (
-                  <KanbanCard key={task.id} {...task} />
+                  <KanbanCard 
+                    key={task.id} 
+                    {...task} 
+                    onClick={() => handleCardClick(task)}
+                  />
                 ))}
               </KanbanColumn>
 
@@ -293,7 +335,11 @@ export default function Dashboard() {
                 onDropTask={(id) => moveTask(id, 'in-progress')}
               >
                 {tasks.filter(t => t.status === 'in-progress').map(task => (
-                  <KanbanCard key={task.id} {...task} />
+                  <KanbanCard 
+                    key={task.id} 
+                    {...task} 
+                    onClick={() => handleCardClick(task)}
+                  />
                 ))}
               </KanbanColumn>
 
@@ -305,7 +351,11 @@ export default function Dashboard() {
                 onDropTask={(id) => moveTask(id, 'review')}
               >
                 {tasks.filter(t => t.status === 'review').map(task => (
-                  <KanbanCard key={task.id} {...task} />
+                  <KanbanCard 
+                    key={task.id} 
+                    {...task} 
+                    onClick={() => handleCardClick(task)}
+                  />
                 ))}
               </KanbanColumn>
 
@@ -317,13 +367,25 @@ export default function Dashboard() {
                 onDropTask={(id) => moveTask(id, 'done')}
               >
                 {tasks.filter(t => t.status === 'done').map(task => (
-                  <KanbanCard key={task.id} {...task} />
+                  <KanbanCard 
+                    key={task.id} 
+                    {...task} 
+                    onClick={() => handleCardClick(task)}
+                  />
                 ))}
               </KanbanColumn>
             </div>
           </div>
         </div>
       </main>
+
+      <TaskDetailDialog 
+        task={selectedTask}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        onUpdateTask={updateTask}
+        onDeleteTask={deleteTask}
+      />
     </div>
     </DndProvider>
   );

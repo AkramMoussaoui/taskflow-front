@@ -33,6 +33,8 @@ graph TD
     G --> K[Colonnes de Statut]
     K --> L[Cartes de Tâches]
     L -->|Glisser-déposer| K
+    L -->|Clic| DV[Vue Détaillée de Tâche]
+    DV -->|Edition/Suppression| G
     
     H --> M[Aperçu des Composants UI]
     
@@ -43,6 +45,6 @@ graph TD
 
 - **Navigation** : Gérée par `React Router`, permettant des transitions instantanées entre les vues sans recharger la page.
 - **Gestion du Drag & Drop** : Utilisation de `react-dnd` pour synchroniser l'UI avec l'état des tâches lors des déplacements.
-- **Ajout de Tâches** : Utilisation d'une modale `Dialog` (Radix UI) pour capturer les nouvelles données et mettre à jour l'état local du Dashboard.
-- **État Global (Simulé)** : Utilisation de `useState` dans le Dashboard pour centraliser la liste des tâches et assurer la cohérence visuelle après chaque action utilisateur.
+- **Gestion Complète des Tâches** : Utilisation de modales `Dialog` (Radix UI) pour la création, l'édition détaillée (titre, tags, dates, commentaires) et la suppression des tâches.
+- **État Global (Simulé)** : Utilisation de `useState` dans le Dashboard pour centraliser la liste des tâches et assurer la cohérence visuelle après chaque action utilisateur (immédiateté des mises à jour).
 - **Design System** : Utilisation de `Tailwind CSS 4` pour un rendu visuel premium et cohérent sur tout le site.
