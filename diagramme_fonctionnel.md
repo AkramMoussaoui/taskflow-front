@@ -21,6 +21,8 @@ graph TD
     D --> E[Barre Latérale - Sidebar]
     D --> F[Section Statistiques]
     D --> G[Tableau Kanban]
+    D -->|Action| CT[Popup de Création de Tâche]
+    CT -->|Validation| G
     
     E -->|Navigation| D
     E -->|Navigation| H[Showcase des Composants]
@@ -41,5 +43,6 @@ graph TD
 
 - **Navigation** : Gérée par `React Router`, permettant des transitions instantanées entre les vues sans recharger la page.
 - **Gestion du Drag & Drop** : Utilisation de `react-dnd` pour synchroniser l'UI avec l'état des tâches lors des déplacements.
+- **Ajout de Tâches** : Utilisation d'une modale `Dialog` (Radix UI) pour capturer les nouvelles données et mettre à jour l'état local du Dashboard.
 - **État Global (Simulé)** : Utilisation de `useState` dans le Dashboard pour centraliser la liste des tâches et assurer la cohérence visuelle après chaque action utilisateur.
 - **Design System** : Utilisation de `Tailwind CSS 4` pour un rendu visuel premium et cohérent sur tout le site.

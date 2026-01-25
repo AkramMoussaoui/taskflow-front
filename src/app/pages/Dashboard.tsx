@@ -25,6 +25,7 @@ import { KanbanCard } from '../components/task/kanban-card';
 import { KanbanColumn } from '../components/task/kanban-column';
 
 import { Logo } from '../components/icons/Logo';
+import { CreateTaskDialog } from '../components/task/create-task-dialog';
 
 // DnD Imports
 import { DndProvider } from 'react-dnd';
@@ -133,6 +134,20 @@ const INITIAL_TASKS: Task[] = [
 export default function Dashboard() {
   const [tasks, setTasks] = React.useState<Task[]>(INITIAL_TASKS);
 
+  const addTask = (data: { title: string; description: string; priority: Task['priority']; tags: string[] }) => {
+    const newTask: Task = {
+      id: Math.random().toString(36).substring(2, 9),
+      title: data.title,
+      priority: data.priority,
+      status: 'todo',
+      assignees: [{ name: "Sarah Chen", initials: "SC" }], // Default assignee for demo
+      tags: data.tags,
+      comments: 0,
+      attachments: 0,
+    };
+    setTasks(prev => [newTask, ...prev]);
+  };
+
   const moveTask = (taskId: string, targetStatus: Task['status']) => {
     setTasks((prev) =>
       prev.map((task) =>
@@ -144,7 +159,7 @@ export default function Dashboard() {
   return (
     <DndProvider backend={HTML5Backend}>
     <div className="flex h-screen bg-slate-50 overflow-hidden">
-      {/* Sidebar */}
+      {/* Sidebar skipped for brevity */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col">
         <div className="p-6 flex items-center gap-3">
           <div className="h-10 w-10 bg-slate-900 text-white rounded-xl flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
@@ -211,10 +226,12 @@ export default function Dashboard() {
               <h2 className="text-2xl font-bold text-slate-900">Project Overview</h2>
               <p className="text-slate-500">Review your team's progress and upcoming tasks</p>
             </div>
-            <Button className="gap-2 shadow-[0_4px_12px_rgba(var(--primary),0.2)]">
-              <Plus className="h-4 w-4" />
-              New Task
-            </Button>
+            <CreateTaskDialog onAddTask={addTask}>
+              <Button className="gap-2 shadow-[0_4px_12px_rgba(var(--primary),0.2)]">
+                <Plus className="h-4 w-4" />
+                New Task
+              </Button>
+            </CreateTaskDialog>
           </div>
 
           {/* Stats Section */}
