@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Showcase from './pages/Showcase';
+import Signup from './pages/Signup';
 
 /**
  * Main App component that handles overall routing and layout.
@@ -12,8 +13,9 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Route: Login Page */}
+        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
 
         {/* Protected Route: Dashboard (for now just a direct route) */}
         <Route path="/dashboard" element={<Dashboard />} />

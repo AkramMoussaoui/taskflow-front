@@ -1,33 +1,51 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
-import { CheckSquare, Mail, Lock, ArrowRight, Github } from 'lucide-react';
+import { Mail, Lock, UserCircle, ArrowRight, Github } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
 import { Logo } from '../components/icons/Logo';
 
 /**
- * Login component providing a premium authenticated entry point.
- * Features a clean, "Google Antigravity" light theme with subtle glassmorphism.
- * @returns {JSX.Element} The rendered Login component.
+ * Signup component for creating new accounts.
+ * Features a role selection dropdown and a premium light theme.
+ * @returns {JSX.Element} The rendered Signup component.
  */
-export default function Login() {
+export default function Signup() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = React.useState(false);
 
+  const [password, setPassword] = React.useState('');
+
+  const constraints = [
+    { label: '8 characters minimum', test: (pwd: string) => pwd.length >= 8 },
+    { label: 'Uppercase letter', test: (pwd: string) => /[A-Z]/.test(pwd) },
+    { label: 'Number', test: (pwd: string) => /[0-9]/.test(pwd) },
+    { label: 'Special character', test: (pwd: string) => /[^A-Za-z0-9]/.test(pwd) },
+  ];
+
+  const isPasswordValid = constraints.every(c => c.test(password));
+
   /**
-   * Handles the login form submission.
+   * Handles the signup form submission.
    * Redirects to the dashboard on success.
    * @param {React.FormEvent} e - The form event.
    */
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isPasswordValid) return;
     setIsLoading(true);
     // Simulate a brief delay for a premium feel
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsLoading(false);
     navigate('/dashboard');
   };
@@ -45,7 +63,7 @@ export default function Login() {
         className="z-10 w-full max-w-md px-4"
       >
         <Card className="border-slate-200 bg-white/80 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
-          <CardHeader className="space-y-1 pb-8 text-center">
+          <CardHeader className="space-y-1 pb-6 text-center">
             <motion.div 
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
@@ -54,13 +72,13 @@ export default function Login() {
             >
               <Logo className="h-7 w-7" />
             </motion.div>
-            <CardTitle className="text-3xl font-bold tracking-tight text-slate-900">Welcome back</CardTitle>
+            <CardTitle className="text-3xl font-bold tracking-tight text-slate-900">Create account</CardTitle>
             <CardDescription className="text-slate-500">
-              Enter your credentials to access your workspace
+              Join TaskFlow and start managing your workspace
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-6">
-            <form onSubmit={handleLogin} className="grid gap-4">
+            <form onSubmit={handleSignup} className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="email" className="text-slate-700 text-sm font-medium ml-1">Email</Label>
                 <div className="relative group">
@@ -75,26 +93,59 @@ export default function Login() {
                 </div>
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center justify-between ml-1">
-                  <Label htmlFor="password" className="text-slate-700 text-sm font-medium">Password</Label>
-                  <Button variant="link" className="px-0 font-normal text-xs text-slate-500 hover:text-slate-900 h-auto transition-colors">
-                    Forgot password?
-                  </Button>
-                </div>
+                <Label htmlFor="password" className="text-slate-700 text-sm font-medium ml-1">Password</Label>
                 <div className="relative group">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
                   <Input
                     id="password"
                     type="password"
+                    placeholder="Create a strong password"
                     className="pl-10 bg-white border-slate-200 text-slate-900 focus:border-primary/50 focus:ring-primary/20 transition-all duration-300"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                 </div>
+                {/* Password Constraints Checklist */}
+                <div className="grid grid-cols-2 gap-2 mt-1 px-1">
+                  {constraints.map((c, i) => {
+                    const isMet = c.test(password);
+                    return (
+                      <div key={i} className="flex items-center gap-2">
+                        <div className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${isMet ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-slate-300'}`} />
+                        <span className={`text-[11px] transition-colors duration-300 ${isMet ? 'text-slate-900 font-medium' : 'text-slate-400'}`}>
+                          {c.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="role" className="text-slate-700 text-sm font-medium ml-1">Workspace Role</Label>
+                <Select required>
+                  <SelectTrigger id="role" className="bg-white border-slate-200 text-slate-900 focus:border-primary/50 focus:ring-primary/20 h-10">
+                    <div className="flex items-center gap-3">
+                      <UserCircle className="h-4 w-4 text-slate-400" />
+                      <SelectValue placeholder="Select your role" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pm">Project Manager</SelectItem>
+                    <SelectItem value="frontend">Frontend Developer</SelectItem>
+                    <SelectItem value="backend">Backend Developer</SelectItem>
+                    <SelectItem value="fullstack">Fullstack Developer</SelectItem>
+                    <SelectItem value="designer">UI/UX Designer</SelectItem>
+                    <SelectItem value="qa">QA Engineer</SelectItem>
+                    <SelectItem value="devops">DevOps Engineer</SelectItem>
+                    <SelectItem value="stakeholder">Stakeholder</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <Button 
                 type="submit" 
-                className="w-full h-11 mt-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-[0_8px_16px_rgba(37,99,235,0.15)] hover:shadow-[0_12px_24px_rgba(37,99,235,0.2)] transition-all duration-300 group"
-                disabled={isLoading}
+                className="w-full h-11 mt-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-[0_8px_16px_rgba(37,99,235,0.15)] hover:shadow-[0_12px_24px_rgba(37,99,235,0.2)] transition-all duration-300 group disabled:opacity-50 disabled:shadow-none"
+                disabled={isLoading || !isPasswordValid}
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">
@@ -103,11 +154,11 @@ export default function Login() {
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                       className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full"
                     />
-                    Authenticating...
+                    Creating Account...
                   </span>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
-                    Sign In
+                    Get Started
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </span>
                 )}
@@ -119,7 +170,7 @@ export default function Login() {
                 <span className="w-full border-t border-slate-200" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-slate-500">Or continue with</span>
+                <span className="bg-white px-2 text-slate-500">Or sign up with</span>
               </div>
             </div>
 
@@ -151,11 +202,11 @@ export default function Login() {
               </Button>
             </div>
           </CardContent>
-          <CardFooter className="pb-8 justify-center">
+          <CardFooter className="pb-8 justify-center border-t border-slate-100 bg-slate-50/50 pt-6">
             <p className="text-slate-500 text-sm">
-              Don&apos;t have an account?{' '}
-              <Link to="/signup" className="font-medium text-primary hover:text-primary/80 transition-colors">
-                Sign up for free
+              Already have an account?{' '}
+              <Link to="/login" className="font-medium text-primary hover:text-primary/80 transition-colors">
+                Sign In
               </Link>
             </p>
           </CardFooter>

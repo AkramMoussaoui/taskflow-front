@@ -5,6 +5,9 @@ TaskFlow est une application web moderne et premium de gestion de tâches. Elle 
 
 ## Fonctionnalités Principales
 - **Authentification Premium** : Une page de connexion élégante avec un thème clair, des animations fluides et une vérification de l'état de chargement.
+- **Création de Compte (Signup)** : Une page d'inscription complète incluant :
+    - Sélection de rôle via un menu déroulant.
+    - **Validation Dynamique du Mot de Passe** : Analyse en temps réel de la complexité (longueur, majuscule, chiffre, caractère spécial).
 - **Tableau de Bord Intégré** : Une vue d'ensemble centralisée combinant des indicateurs de performance clés (KPI) et un tableau Kanban.
 - **Indicateurs de Performance (Stats)** : Suivi en temps réel des tâches totales, en cours, terminées et des membres de l'équipe.
 - **Tableau Kanban** : Organisation visuelle des tâches par colonnes (À faire, En cours, Révision, Terminé) avec cards détaillées (priorité, tags, assignés, dates).

@@ -13,6 +13,9 @@ graph TD
     B -->|Non connecté| C[Page de Connexion]
     B -->|Connecté| D[Tableau de Bord]
     
+    C <-->|Lien| Signup[Page d'Inscription]
+    Signup -->|Création de compte| D
+    
     C -->|Identifiants valides| D
     
     D --> E[Barre Latérale - Sidebar]
