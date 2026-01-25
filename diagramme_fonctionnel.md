@@ -9,7 +9,11 @@ Ce document décrit les interactions entre les différents composants de l'appli
 
 ```mermaid
 graph TD
-    A[Utilisateur] --> B{Authentification}
+    User[Utilisateur] --> LP[Landing Page Premium]
+    LP -->|Navigation| Features[Section Fonctionnalités]
+    LP -->|Navigation| Pricing[Section Tarification]
+    LP -->|Clic: Sign In / Get Started| B{Authentification}
+    
     B -->|Non connecté| C[Page de Connexion]
     B -->|Connecté| D[Tableau de Bord]
     

@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Showcase from './pages/Showcase';
 import Signup from './pages/Signup';
+import Landing from './pages/Landing';
 
 /**
  * Main App component that handles overall routing and layout.
@@ -13,7 +14,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
+        {/* Landing Page */}
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
@@ -23,11 +25,8 @@ function App() {
         {/* Design System Showcase */}
         <Route path="/showcase" element={<Showcase />} />
 
-        {/* Redirect root to login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-
-        {/* Catch-all: Redirect to login or show 404 */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* Catch-all: Redirect to landing */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

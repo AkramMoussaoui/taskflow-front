@@ -4,6 +4,7 @@
 TaskFlow est une application web moderne et premium de gestion de tâches. Elle est conçue pour offrir une expérience utilisateur fluide, esthétique et performante pour les équipes souhaitant organiser leur travail efficacement.
 
 ## Fonctionnalités Principales
+- **Landing Page Premium** : Une vitrine moderne et immersive présentant les bénéfices de TaskFlow, avec une navigation fluide et des sections Hero, Fonctionnalités, Témoignages et Tarification.
 - **Authentification Premium** : Une page de connexion élégante avec un thème clair, des animations fluides et une vérification de l'état de chargement.
 - **Création de Compte (Signup)** : Une page d'inscription complète incluant :
     - Sélection de rôle via un menu déroulant.
@@ -27,7 +28,8 @@ TaskFlow est une application web moderne et premium de gestion de tâches. Elle 
 
 ## Architecture Technique
 - **Frontend** : React 19 (TypeScript)
-- **Routage** : React Router Dom 7
+- **Routage** : React Router Dom 7 (Navigation fluide entre Landing, Login et Dashboard).
+- **Smooth Scrolling** : Expérience de navigation optimisée sur la landing page via CSS global.
 - **Stylisation** : Tailwind CSS 4 & Radix UI pour des composants accessibles et hautement personnalisables.
 - **Icons** : Lucide React & Logo SVG personnalisé.
 - **Animations** : Framer Motion pour les transitions et micro-interactions premium.
