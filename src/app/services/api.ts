@@ -26,12 +26,22 @@ export interface TaskResponse extends TaskData {
  * Standard fetch wrapper with error handling.
  */
 async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  const token = localStorage.getItem('taskflow_id_token');
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...options?.headers,
+  };
+
+  if (token) {
+    (headers as any)['Authorization'] = token; // API Gateway expects "Authorization: <token>" or "Bearer <token>" depending on configuration.
+    // For Cognito Authorizer with "Header: Authorization", usually just the token if not standard OAuth/OIDC flow, OR "Bearer <token>".
+    // AWS Cognito HTTP Authorizer typically parses the Bearer.
+    (headers as any)['Authorization'] = `Bearer ${token}`;
+  }
+
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
+    headers,
   });
 
   if (!response.ok) {
