@@ -407,7 +407,20 @@ export default function Signup() {
                     <Github className="mr-2 h-4 w-4" />
                     GitHub
                   </Button>
-                  <Button variant="outline" className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 h-10 rounded-xl transition-all">
+                  <Button 
+                    variant="outline" 
+                    className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 h-10 rounded-xl transition-all"
+                    onClick={() => {
+                        // Cognito Hosted UI URL
+                        const domain = 'https://taskflow-290456977869.auth.eu-west-1.amazoncognito.com';
+                        const clientId = '146kacf41m3gjta57snqjbvai4';
+                        const redirectUri = 'http://localhost:5173/auth/callback';
+                        const responseType = 'code';
+                        const scope = 'email+openid+profile';
+                        
+                        window.location.href = `${domain}/oauth2/authorize?client_id=${clientId}&response_type=${responseType}&scope=${scope}&redirect_uri=${redirectUri}&identity_provider=Google`;
+                    }}
+                  >
                     <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                       <path
                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
