@@ -192,6 +192,26 @@ export default function Dashboard() {
 
   return (
     <DndProvider backend={HTML5Backend}>
+    {/* Mobile Restriction Overlay */}
+    <div className="fixed inset-0 z-50 bg-slate-50 flex flex-col items-center justify-center p-6 text-center md:hidden">
+      <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full">
+        <div className="h-12 w-12 bg-slate-900 text-white rounded-xl flex items-center justify-center shadow-lg mx-auto mb-6">
+          <Logo className="h-7 w-7" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-900 mb-2">Desktop Access Only</h2>
+        <p className="text-slate-500 mb-6">
+          TaskFlow is optimized for desktop productivity. Please open this dashboard on a larger screen.
+        </p>
+        <Button 
+          variant="outline" 
+          onClick={handleSignOut}
+          className="w-full"
+        >
+          Sign Out
+        </Button>
+      </div>
+    </div>
+
     <div className="flex h-screen bg-slate-50 overflow-hidden">
       {/* Sidebar skipped for brevity */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col">
