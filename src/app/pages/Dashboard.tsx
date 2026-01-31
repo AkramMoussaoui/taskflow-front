@@ -34,6 +34,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 
 // API Service
 import { taskApi, TaskResponse } from '../services/api';
+import { handleSignOut } from '../utils/auth';
 
 /**
  * Comment interface.
@@ -71,21 +72,31 @@ export default function Dashboard() {
   const [selectedTask, setSelectedTask] = React.useState<Task | null>(null);
   const [detailOpen, setDetailOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [userProfile, setUserProfile] = React.useState<{ firstName: string; lastName: string; role: string } | null>(null);
 
   // Load tasks on mount
   React.useEffect(() => {
-    const loadTasks = async () => {
+    const loadData = async () => {
       try {
         setIsLoading(true);
-        const data = await taskApi.listTasks();
+        const [tasksData, profileData] = await Promise.all([
+          taskApi.listTasks(),
+          taskApi.getUserProfile()
+        ]);
+        
+        setUserProfile(profileData);
+
         // Map backend taskId to frontend id
-        const mappedTasks: Task[] = data.map(t => ({
+        const mappedTasks: Task[] = tasksData.map(t => ({
           id: t.taskId,
           title: t.title,
           description: t.description,
           priority: t.priority,
           status: t.status,
-          assignees: t.assignees || [{ name: "Sarah Chen", initials: "SC" }],
+          assignees: t.assignees || [{ 
+            name: `${profileData.firstName} ${profileData.lastName}`, 
+            initials: `${profileData.firstName[0]}${profileData.lastName[0]}` 
+          }],
           tags: t.tags || [],
           comments: t.comments || [],
           dueDate: t.dueDate,
@@ -93,12 +104,12 @@ export default function Dashboard() {
         }));
         setTasks(mappedTasks);
       } catch (error) {
-        console.error('Failed to load tasks:', error);
+        console.error('Failed to load data:', error);
       } finally {
         setIsLoading(false);
       }
     };
-    loadTasks();
+    loadData();
   }, []);
 
   const handleCardClick = (task: Task) => {
@@ -199,10 +210,13 @@ export default function Dashboard() {
         </nav>
 
         <div className="p-4 border-t border-slate-200">
-          <Link to="/login" className="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+          <button 
+            onClick={handleSignOut}
+            className="w-full flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors text-left"
+          >
             <LogOut className="h-5 w-5" />
             Sign Out
-          </Link>
+          </button>
         </div>
       </aside>
 
@@ -227,11 +241,17 @@ export default function Dashboard() {
             <Separator orientation="vertical" className="h-6" />
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-semibold text-slate-900">Sarah Chen</p>
-                <p className="text-xs text-slate-500">Project Manager</p>
+                <p className="text-sm font-semibold text-slate-900">
+                  {userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : 'Loading...'}
+                </p>
+                <p className="text-xs text-slate-500">
+                  {userProfile?.role || 'User'}
+                </p>
               </div>
               <Avatar>
-                <AvatarFallback>SC</AvatarFallback>
+                <AvatarFallback>
+                  {userProfile ? `${userProfile.firstName[0]}${userProfile.lastName[0]}` : '...'}
+                </AvatarFallback>
               </Avatar>
             </div>
           </div>

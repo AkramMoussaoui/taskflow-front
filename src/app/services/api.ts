@@ -32,10 +32,7 @@ async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T> 
     ...options?.headers,
   };
 
-  if (token) {
-    (headers as any)['Authorization'] = token; // API Gateway expects "Authorization: <token>" or "Bearer <token>" depending on configuration.
-    // For Cognito Authorizer with "Header: Authorization", usually just the token if not standard OAuth/OIDC flow, OR "Bearer <token>".
-    // AWS Cognito HTTP Authorizer typically parses the Bearer.
+  if (token && !(headers as any)['Authorization']) {
     (headers as any)['Authorization'] = `Bearer ${token}`;
   }
 
@@ -156,6 +153,39 @@ export const taskApi = {
     return apiFetch<{ message: string }>('/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify({ email, code, newPassword }),
+    });
+  },
+  /**
+   * Fetches the Google OAuth URL from the backend.
+   */
+  getGoogleAuthUrl: async (redirectUri: string): Promise<{ url: string }> => {
+    // API Gateway or Function URL endpoint
+    // Note: If using API Gateway, it might be just /auth/google-url if mapped correctly
+    return apiFetch<{ url: string }>(`/auth/google-url?redirect_uri=${encodeURIComponent(redirectUri)}`, {
+      method: 'GET',
+    });
+  },
+
+  /**
+   * Refreshes the access token using a refresh token.
+   */
+  refreshToken: async (refreshToken: string): Promise<{ accessToken: string; idToken: string; expiresIn: number }> => {
+    return apiFetch<{ accessToken: string; idToken: string; expiresIn: number }>('/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken }),
+    });
+  },
+
+  /**
+   * Fetches the current user's profile.
+   */
+  getUserProfile: async (): Promise<{ email: string; firstName: string; lastName: string; role: string; username: string }> => {
+    const accessToken = localStorage.getItem('taskflow_access_token');
+    return apiFetch<{ email: string; firstName: string; lastName: string; role: string; username: string }>('/auth/user', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
     });
   },
 };

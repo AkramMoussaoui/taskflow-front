@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, UserCircle, ArrowRight, Github } from 'lucide-react';
+import { Mail, Lock, UserCircle, ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -21,6 +21,7 @@ import {
 } from '../components/ui/input-otp';
 import { Logo } from '../components/icons/Logo';
 import { taskApi } from '../services/api';
+import { handleGoogleSignIn } from '../utils/auth';
 
 /**
  * Signup component for creating new accounts.
@@ -404,22 +405,15 @@ export default function Signup() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <Button variant="outline" className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 h-10 rounded-xl transition-all">
-                    <Github className="mr-2 h-4 w-4" />
-                    GitHub
+                    <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.74 1.18 0 2.05-.8 3.23-.74 2.08.09 3.14 1.25 3.53 1.94-3.13 2.1-2.43 6.38 1.14 7.76-.66 2.09-1.95 4.09-3.02 5.09-1.25 1.09-2.05.95-2.96.18zm-2.96-13.43c-1.35 1.5-3.32 2.37-4.38 1.48-1.55-1.57-1.12-3.82.26-5.32 1.34-1.29 3.53-2.31 4.58-1.46.99 1.48.57 3.93-.46 5.3z" />
+                    </svg>
+                    Apple
                   </Button>
                   <Button 
                     variant="outline" 
                     className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 h-10 rounded-xl transition-all"
-                    onClick={() => {
-                        // Cognito Hosted UI URL
-                        const domain = 'https://taskflow-290456977869.auth.eu-west-1.amazoncognito.com';
-                        const clientId = '146kacf41m3gjta57snqjbvai4';
-                        const redirectUri = `${window.location.origin}/auth/callback`;
-                        const responseType = 'code';
-                        const scope = 'email+openid+profile';
-                        
-                        window.location.href = `${domain}/oauth2/authorize?client_id=${clientId}&response_type=${responseType}&scope=${scope}&redirect_uri=${redirectUri}&identity_provider=Google`;
-                    }}
+                    onClick={() => handleGoogleSignIn(setError)}
                   >
                     <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                       <path

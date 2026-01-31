@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Github } from 'lucide-react';
+import { Mail, Lock, ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -14,6 +14,7 @@ import {
 } from '../components/ui/input-otp';
 import { Logo } from '../components/icons/Logo';
 import { taskApi } from '../services/api';
+import { handleGoogleSignIn } from '../utils/auth';
 
 /**
  * Login component providing a premium authenticated entry point.
@@ -34,6 +35,51 @@ export default function Login() {
   const [resetCode, setResetCode] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState<string | null>(null);
+
+  // Auto-login check
+  React.useEffect(() => {
+    const checkSession = async () => {
+      // Only run auto-login on initial view
+      if (state?.initialView) return;
+
+      const accessToken = localStorage.getItem('taskflow_access_token');
+      const refreshToken = localStorage.getItem('taskflow_refresh_token');
+      const idToken = localStorage.getItem('taskflow_id_token') || '';
+
+      if (!accessToken || !refreshToken) return;
+
+      try {
+        // Simple JWT expiration check
+        const payload = JSON.parse(atob(idToken.split('.')[1]));
+        const exp = payload.exp * 1000;
+        
+        if (Date.now() < exp) {
+           // Token is valid
+           navigate('/dashboard');
+        } else {
+           // Token expired, try refresh
+           console.log('Session expired, refreshing token...');
+           const response = await taskApi.refreshToken(refreshToken);
+           
+           localStorage.setItem('taskflow_access_token', response.accessToken);
+           localStorage.setItem('taskflow_id_token', response.idToken);
+           // Refresh token might be rotated, but assuming the old one is still valid or we got a new one if Cognito returns it. 
+           // Standard response from InitiateAuth REFRESH_TOKEN_AUTH might not include a new refresh token unless rotated.
+           
+           navigate('/dashboard');
+        }
+      } catch (err) {
+        console.error('Auto-login failed:', err);
+        // Clear invalid tokens
+        localStorage.removeItem('taskflow_access_token');
+        localStorage.removeItem('taskflow_id_token');
+        localStorage.removeItem('taskflow_refresh_token');
+        localStorage.removeItem('taskflow_email');
+      }
+    };
+
+    checkSession();
+  }, [navigate]);
 
   // Update view if state changes (e.g., navigating from Signup)
   React.useEffect(() => {
@@ -324,10 +370,16 @@ export default function Login() {
 
             <div className="grid grid-cols-2 gap-4">
               <Button variant="outline" className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 h-10 rounded-xl transition-all">
-                <Github className="mr-2 h-4 w-4" />
-                GitHub
+                <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.74 1.18 0 2.05-.8 3.23-.74 2.08.09 3.14 1.25 3.53 1.94-3.13 2.1-2.43 6.38 1.14 7.76-.66 2.09-1.95 4.09-3.02 5.09-1.25 1.09-2.05.95-2.96.18zm-2.96-13.43c-1.35 1.5-3.32 2.37-4.38 1.48-1.55-1.57-1.12-3.82.26-5.32 1.34-1.29 3.53-2.31 4.58-1.46.99 1.48.57 3.93-.46 5.3z" />
+                </svg>
+                Apple
               </Button>
-              <Button variant="outline" className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 h-10 rounded-xl transition-all">
+              <Button 
+                variant="outline" 
+                className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 h-10 rounded-xl transition-all"
+                onClick={() => handleGoogleSignIn(setError)}
+              >
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />

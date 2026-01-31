@@ -55,8 +55,11 @@ export default function AuthCallback() {
         const data = await response.json();
         
         if (data.id_token) {
-          // Store token in localStorage (matching api.ts logic)
+          // Store tokens in localStorage (matching api.ts logic)
           localStorage.setItem('taskflow_id_token', data.id_token);
+          if (data.access_token) localStorage.setItem('taskflow_access_token', data.access_token);
+          if (data.refresh_token) localStorage.setItem('taskflow_refresh_token', data.refresh_token);
+          
           setStatus('Login successful! Redirecting...');
           setTimeout(() => navigate('/dashboard'), 1000);
         } else {
