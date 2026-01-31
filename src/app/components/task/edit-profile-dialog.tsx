@@ -8,13 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { taskApi } from '../../services/api';
@@ -99,23 +92,12 @@ export function EditProfileDialog({ open, onOpenChange, currentUser, onProfileUp
               <Label htmlFor="role" className="text-right">
                 Role
               </Label>
-              <div className="col-span-3">
-                <Select value={role} onValueChange={setRole}>
-                  <SelectTrigger id="role">
-                    <SelectValue placeholder="Select your role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pm">Project Manager</SelectItem>
-                    <SelectItem value="frontend">Frontend Developer</SelectItem>
-                    <SelectItem value="backend">Backend Developer</SelectItem>
-                    <SelectItem value="fullstack">Fullstack Developer</SelectItem>
-                    <SelectItem value="designer">UI/UX Designer</SelectItem>
-                    <SelectItem value="qa">QA Engineer</SelectItem>
-                    <SelectItem value="devops">DevOps Engineer</SelectItem>
-                    <SelectItem value="stakeholder">Stakeholder</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <Input
+                id="role"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="col-span-3"
+              />
             </div>
           </div>
           <DialogFooter>
