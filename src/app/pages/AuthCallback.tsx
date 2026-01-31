@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 // TODO: improvements - move these to env vars
 const COGNITO_DOMAIN = 'https://taskflow-290456977869.auth.eu-west-1.amazoncognito.com';
 const CLIENT_ID = '146kacf41m3gjta57snqjbvai4';
-const REDIRECT_URI = 'http://localhost:5173/auth/callback';
+const REDIRECT_URI = `${window.location.origin}/auth/callback`;
 
 export default function AuthCallback() {
   const [searchParams] = useSearchParams();

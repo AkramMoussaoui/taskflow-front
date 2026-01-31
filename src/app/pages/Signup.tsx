@@ -414,7 +414,7 @@ export default function Signup() {
                         // Cognito Hosted UI URL
                         const domain = 'https://taskflow-290456977869.auth.eu-west-1.amazoncognito.com';
                         const clientId = '146kacf41m3gjta57snqjbvai4';
-                        const redirectUri = 'http://localhost:5173/auth/callback';
+                        const redirectUri = `${window.location.origin}/auth/callback`;
                         const responseType = 'code';
                         const scope = 'email+openid+profile';
                         
