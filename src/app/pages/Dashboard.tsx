@@ -11,7 +11,8 @@ import {
   LogOut,
   Bell,
   Search,
-  Plus
+  Plus,
+  Pen
 } from 'lucide-react';
 
 import { Button } from '../components/ui/button';
@@ -27,6 +28,7 @@ import { KanbanColumn } from '../components/task/kanban-column';
 import { Logo } from '../components/icons/Logo';
 import { CreateTaskDialog } from '../components/task/create-task-dialog';
 import { TaskDetailDialog } from '../components/task/task-detail-dialog';
+import { EditProfileDialog } from '../components/task/edit-profile-dialog';
 
 // DnD Imports
 import { DndProvider } from 'react-dnd';
@@ -71,6 +73,7 @@ export default function Dashboard() {
   const [tasks, setTasks] = React.useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = React.useState<Task | null>(null);
   const [detailOpen, setDetailOpen] = React.useState(false);
+  const [editProfileOpen, setEditProfileOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [userProfile, setUserProfile] = React.useState<{ firstName: string; lastName: string; role: string } | null>(null);
 
@@ -190,6 +193,10 @@ export default function Dashboard() {
     }
   };
 
+  const handleProfileUpdated = (newData: { firstName: string; lastName: string; role: string }) => {
+    setUserProfile(newData);
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
     {/* Mobile Restriction Overlay */}
@@ -268,11 +275,16 @@ export default function Dashboard() {
                   {userProfile?.role || 'User'}
                 </p>
               </div>
-              <Avatar>
-                <AvatarFallback>
-                  {userProfile ? `${userProfile.firstName[0]}${userProfile.lastName[0]}` : '...'}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative group cursor-pointer" onClick={() => setEditProfileOpen(true)}>
+                <Avatar>
+                  <AvatarFallback>
+                    {userProfile ? `${userProfile.firstName[0]}${userProfile.lastName[0]}` : '...'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Pen className="h-4 w-4 text-white" />
+                </div>
+              </div>
             </div>
           </div>
         </header>
@@ -415,6 +427,13 @@ export default function Dashboard() {
         onOpenChange={setDetailOpen}
         onUpdateTask={updateTask}
         onDeleteTask={deleteTask}
+      />
+      
+      <EditProfileDialog 
+        open={editProfileOpen}
+        onOpenChange={setEditProfileOpen}
+        currentUser={userProfile}
+        onProfileUpdated={handleProfileUpdated}
       />
     </div>
     </DndProvider>

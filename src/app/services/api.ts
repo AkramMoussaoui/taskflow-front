@@ -188,4 +188,18 @@ export const taskApi = {
       }
     });
   },
+
+  /**
+   * Updates the current user's profile.
+   */
+  updateUserProfile: async (updates: { firstName?: string; lastName?: string; role?: string }): Promise<{ message: string }> => {
+    const accessToken = localStorage.getItem('taskflow_access_token');
+    return apiFetch<{ message: string }>('/auth/user', {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      },
+      body: JSON.stringify(updates),
+    });
+  },
 };
